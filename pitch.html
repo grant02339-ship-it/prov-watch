@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PROV Portfolio Watch</title>
+<meta name="description" content="A quarterly, sourced report on every portfolio company: who could buy it and what they say they want, how exposed it is to AI, and what its competitors did. Every fact checked against its source, then reviewed by a person.">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<script>
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-motion')}
+try{if(localStorage.getItem('null-theme')==='light'){document.documentElement.setAttribute('data-theme','light')}}catch(e){}
+</script>
+<style>
+:root{
+  /* dark is the default; the sheet stays paper-white in both themes, so paper tokens don't change */
+  --bg:#0B0B0C; --bg-2:#161618; --bg-3:#222225; --line:rgba(237,237,234,.11); --line-2:rgba(237,237,234,.26);
+  --text:#EDEDEA; --muted:#9A9A95; --nav-bg:rgba(11,11,12,.82);
+  --paper:#FDFDFC; --paper-2:#E6E6E3; --paper-text:#1C1D1F; --paper-muted:#5F6267; --paper-foot:#F7F7F5;
+  --stack-1:#E9E9E6; --stack-2:#D6D6D2;
+  --accent:#C9A36A; --accent-line:#C9A36A; --accent-ink:#7E6130; --hl:#EEDDBF; --glow:201,163,106;
+  --ink-btn:#EDEDEA; --ink-btn-hover:#FFFFFF; --on-ink:#0B0B0C;
+  --shadow:0,0,0;
+  --ok:#1C7550; --no:#A83A1E;
+  --sans:"Geist",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --serif:"Source Serif 4",Georgia,serif;
+  --r:6px; --r-paper:4px; --nav:64px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#F3F3F1; --bg-2:#EAEAE7; --bg-3:#DEDEDA; --line:rgba(28,29,31,.12); --line-2:rgba(28,29,31,.28);
+  --text:#1C1D1F; --muted:#5F6267; --nav-bg:rgba(243,243,241,.86);
+  --stack-1:#E9E9E6; --stack-2:#DEDEDA;
+  --accent:#B8441D; --accent-line:#D9572B; --accent-ink:#B8441D; --hl:#F7D2C1; --glow:217,87,43;
+  --ink-btn:#1C1D1F; --ink-btn-hover:#36383C; --on-ink:#FBFBFA;
+  --shadow:28,29,31;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--nav) + 16px)}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.6 var(--sans);
+     -webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+::selection{background:var(--hl)}
+.skip{position:absolute;left:16px;top:-80px;z-index:100;background:var(--ink-btn);color:var(--on-ink);
+      padding:12px 16px;border-radius:var(--r);font-weight:500;text-decoration:none}
+.skip:focus{top:12px}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:clamp(16px,4vw,40px)}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:30;height:var(--nav);border-bottom:1px solid var(--line);
+     background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.nav .wrap{height:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px}
+.nav-left{font-size:14px;justify-self:start}
+.nav-left a{text-decoration:none;color:var(--muted);transition:color .2s}
+.nav-left a:hover{color:var(--text)}
+.wordmark{justify-self:center;font-weight:500;font-size:15px;letter-spacing:.32em;text-transform:uppercase;
+          text-decoration:none;white-space:nowrap;padding-left:.32em}
+.wordmark span{color:var(--muted);font-weight:400}
+.nav-links{justify-self:end;display:flex;align-items:center;gap:28px;font-size:15px}
+.nav-links a:not(.btn){text-decoration:none;color:var(--muted);transition:color .2s}
+.nav-links a:not(.btn):hover{color:var(--text)}
+@media (max-width:640px){
+  .nav .wrap{grid-template-columns:auto 1fr;gap:12px}
+  .nav-left{display:none}
+  .wordmark{justify-self:start;letter-spacing:.24em;font-size:14px;padding-left:0}
+}
+/* phones: the hero's own button (same label) is right below, so the nav keeps just the wordmark */
+@media (max-width:480px){.nav-links .btn{display:none}}
+
+/* buttons: 6px radius everywhere interactive; paper sheets are 4px */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 24px;
+     border-radius:var(--r);border:1px solid transparent;font:500 13px/1 var(--sans);letter-spacing:.14em;
+     text-transform:uppercase;text-decoration:none;
+     white-space:nowrap;cursor:pointer;touch-action:manipulation;
+     transition:transform .2s var(--ease),background-color .2s,border-color .2s,color .2s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--ink-btn);color:var(--on-ink)}
+.btn-primary:hover{background:var(--ink-btn-hover)}
+.btn-quiet{border-color:var(--line-2);color:var(--text);background:transparent}
+.btn-quiet:hover{border-color:var(--text)}
+.btn-sm{min-height:40px;padding:0 16px;font-size:12px}
+.btn[disabled]{opacity:.5;cursor:progress}
+
+/* headline word reveal (JS wraps words) */
+.w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.1em;margin-bottom:-.1em}
+.w>span{display:inline-block}
+
+/* paper sheet: the one object the whole site is built around */
+.sheet-stack{position:relative;width:100%;height:100%}
+.sheet-stack::before,.sheet-stack::after{content:"";position:absolute;inset:0;border-radius:var(--r-paper);
+     background:var(--stack-1);box-shadow:0 20px 50px -28px rgba(var(--shadow),.5)}
+.sheet-stack::before{transform:rotate(2.2deg) translate(10px,6px);background:var(--stack-2)}
+.sheet-stack::after{transform:rotate(.9deg) translate(4px,3px)}
+.sheet{position:relative;z-index:1;width:100%;height:100%;background:var(--paper);color:var(--paper-text);
+       border-radius:var(--r-paper);overflow:hidden;display:grid;grid-template-rows:auto 1fr auto;
+       transform:rotate(-.6deg);
+       box-shadow:0 0 0 1px rgba(var(--shadow),.06),0 40px 90px -40px rgba(var(--shadow),.45),0 10px 24px -14px rgba(var(--shadow),.25)}
+.sheet-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:16px 24px;
+            border-bottom:1px solid var(--paper-2);font:500 13px/1.3 var(--sans);color:var(--paper-muted)}
+.sheet-head b{color:var(--paper-text);font-weight:600}
+.sheet-head .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sheet-body{position:relative;overflow:hidden}
+.doc{padding:22px 24px 0}
+.doc p{font:400 15px/1.62 var(--serif);margin:0 0 12px;color:var(--paper-text)}
+mark.hl{color:inherit;padding:0 1px;border-radius:2px;
+        background:linear-gradient(var(--hl),var(--hl)) no-repeat 0 85%/100% 80%}
+.scan{position:absolute;left:0;right:0;top:0;height:2px;background:var(--accent-line);opacity:0;pointer-events:none}
+.scan::before{content:"";position:absolute;left:0;right:0;bottom:2px;height:64px;
+              background:linear-gradient(to top,rgba(var(--glow),.2),rgba(var(--glow),0))}
+.finds{position:absolute;inset:16px 16px auto 16px}
+.finds-head{display:flex;justify-content:space-between;font:600 13px/1 var(--sans);color:var(--paper-muted);margin:2px 4px 10px}
+.finds-head .num{color:var(--paper-text)}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 12px;margin-bottom:6px;
+     background:#fff;border:1px solid var(--paper-2);border-radius:var(--r-paper);font:500 14px/1.3 var(--sans)}
+.row .v{font-weight:600;white-space:nowrap}
+.row .v.ok{color:var(--ok)} .row .v.no{color:var(--no)} .row .v.mid{color:var(--paper-muted)}
+.row .v.cite{font:500 12.5px/1.3 var(--mono);color:var(--paper-muted)}
+.sheet-foot{border-top:1px solid var(--paper-2);padding:14px 24px 18px;background:var(--paper-foot)}
+.call{display:grid;grid-template-columns:repeat(3,auto);justify-content:space-between;gap:12px}
+.call div{font:500 12.5px/1.3 var(--sans);color:var(--paper-muted)}
+.call strong{display:block;margin-top:4px;font:600 20px/1.1 var(--sans);color:var(--paper-text);letter-spacing:-.01em}
+.call .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500}
+.grade{margin-top:12px;padding-top:12px;border-top:1px dashed #CFCFCA;display:flex;gap:10px;align-items:baseline;
+       font:500 13.5px/1.4 var(--sans);color:var(--paper-text)}
+.grade b{color:var(--ok);font-weight:600;white-space:nowrap}
+.grade span{min-width:0}
+.stamp{position:absolute;right:28px;bottom:28px;z-index:3;padding:10px 14px 9px;border:2.5px solid var(--accent-ink);
+       outline:1px solid var(--accent-ink);outline-offset:3px;border-radius:3px;color:var(--accent-ink);transform:rotate(-8deg);
+       background:rgba(253,253,252,.88);text-align:center;mix-blend-mode:multiply}
+.stamp strong{display:block;font:600 20px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase}
+.stamp span{display:block;margin-top:5px;font:500 11.5px/1.35 var(--mono);font-variant-numeric:tabular-nums}
+.example-note{position:absolute;left:24px;bottom:-30px;font-size:13px;color:var(--muted)}
+
+/* footer */
+.site-foot{border-top:1px solid var(--line);padding:40px 0 56px}
+.site-foot .wrap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px}
+.site-foot p{margin:0;max-width:70ch;color:var(--muted);font-size:14.5px;line-height:1.6}
+.foot-mark{justify-self:start;padding-left:0;font-size:13px}
+.theme-toggle{grid-column:2;justify-self:start;margin-top:4px;padding:8px 0;border:0;background:none;color:var(--muted);
+              font:500 12px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;
+              border-bottom:1px solid var(--line-2)}
+.theme-toggle:hover{color:var(--text)}
+@media (max-width:640px){.theme-toggle{grid-column:1}}
+@media (max-width:640px){.site-foot .wrap{grid-template-columns:1fr}}
+
+/* story: hero + sticky sheet + steps share one grid */
+.story-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);column-gap:clamp(40px,6vw,96px)}
+.hero{grid-column:1;grid-row:1;min-height:calc(100dvh - var(--nav));display:flex;flex-direction:column;
+      justify-content:center;padding-block:48px 64px}
+.hero h1{font-weight:300;font-size:clamp(40px,4.4vw,66px);line-height:1;letter-spacing:-.02em;margin:0;
+         max-width:14ch;text-transform:uppercase;text-wrap:balance}
+.lede{font-size:clamp(18px,1.45vw,20px);line-height:1.55;color:var(--muted);max-width:36ch;margin:28px 0 0}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.sheet-col{grid-column:2;grid-row:1/3}
+.sheet-stick{position:sticky;top:calc(var(--nav) + 5vh);height:calc(100dvh - var(--nav) - 12vh);
+             min-height:520px;max-height:760px}
+.steps{grid-column:1;grid-row:2;position:relative;padding-left:32px;padding-bottom:24vh}
+.rail{position:absolute;left:0;top:10vh;bottom:30vh;width:2px;background:var(--line)}
+.rail i{display:block;height:100%;background:var(--accent-line);transform-origin:top}
+.step{min-height:80dvh;display:flex;flex-direction:column;justify-content:center;max-width:470px;
+      transition:opacity .5s var(--ease)}
+.js-motion .step{opacity:.26}
+.js-motion .step.on{opacity:1}
+.verb{font:500 12px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+.step h2{font-weight:300;font-size:clamp(28px,2.7vw,40px);line-height:1.05;letter-spacing:-.015em;margin:0 0 18px;
+         text-transform:uppercase;text-wrap:balance}
+.step p{color:var(--muted);margin:0;max-width:44ch}
+.step p+p{margin-top:12px}
+.step ul{margin:6px 0 0;padding:0;list-style:none;color:var(--muted);max-width:46ch}
+.step li{padding:7px 0 7px 18px;position:relative}
+.step li::before{content:"";position:absolute;left:0;top:18px;width:8px;height:2px;background:var(--line-2)}
+
+/* sections after the story */
+.section{padding-block:clamp(96px,12vw,168px);border-top:1px solid var(--line)}
+.section h2{font-weight:300;font-size:clamp(32px,3.6vw,54px);line-height:1.02;letter-spacing:-.02em;margin:0;max-width:18ch;
+            text-transform:uppercase;text-wrap:balance}
+.section .sub{color:var(--muted);max-width:52ch;margin:20px 0 0;font-size:18px}
+
+/* tools (Firms): one feature tile + two stacked */
+.tools{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;margin-top:56px}
+.tool{border:1px solid var(--line);border-radius:var(--r);padding:32px;background:transparent}
+.tool h3{margin:0 0 10px;font-size:22px;letter-spacing:-.015em;font-weight:500}
+.tool p{margin:0;color:var(--muted);max-width:46ch}
+.tool.feature{grid-row:1/3;background:var(--paper);color:var(--paper-text);border-color:transparent;border-radius:var(--r-paper);
+              box-shadow:0 0 0 1px rgba(var(--shadow),.06),0 30px 70px -40px rgba(var(--shadow),.4)}
+.tool.feature p{color:var(--paper-muted)}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin:28px 0 0;padding:0;list-style:none}
+.checks li{font:500 15px/1.35 var(--sans);padding-top:10px;border-top:1px solid var(--paper-2)}
+@media (max-width:900px){.tools{grid-template-columns:1fr}.tool.feature{grid-row:auto}}
+@media (max-width:520px){.checks{grid-template-columns:1fr}}
+
+/* working together: a real five-part sequence, laid out as a horizontal track */
+.flow{list-style:none;margin:64px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:28px}
+.flow li{border-top:1px solid var(--accent-line);padding-top:24px}
+.flow h3{margin:0 0 10px;font-size:18px;letter-spacing:-.01em;font-weight:500}
+.flow p{margin:0;color:var(--muted);font-size:15.5px;line-height:1.55}
+@media (max-width:1000px){
+  .flow{grid-template-columns:1fr 1fr;gap:36px 28px}
+}
+
+@media (max-width:560px){.flow{grid-template-columns:1fr}}
+
+/* boundaries */
+.bounds{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,96px);margin-top:56px}
+.bounds h3{margin:0 0 20px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:500}
+.bounds .isnt h3{color:var(--muted)}
+.bounds ul{margin:0;padding:0;list-style:none}
+.bounds li{padding:14px 0;border-top:1px solid var(--line);color:var(--text)}
+.bounds .isnt li{color:var(--muted)}
+@media (max-width:760px){.bounds{grid-template-columns:1fr}}
+
+/* engage */
+.engage h2{font-size:clamp(44px,7vw,108px);line-height:.98;letter-spacing:-.025em;max-width:13ch}
+.engage-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px;margin-top:40px}
+.mailbox{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line-2);border-radius:var(--r);padding:4px 4px 4px 16px}
+.mailbox code{font:500 15px/1 var(--mono);color:var(--text)}
+.copy-btn{min-height:40px;padding:0 14px;border:0;border-radius:4px;background:var(--bg-2);color:var(--text);
+          font:500 14px/1 var(--sans);cursor:pointer}
+.copy-btn:hover{background:var(--bg-3)}
+
+/* short desktop windows (laptops around 768px tall): tighter rows and a one-line stamp, so seven
+   results and the stamp both fit on the sheet without overlapping */
+@media (min-width:901px) and (max-height:860px){
+  .doc p{font-size:14px;margin-bottom:9px}
+  .row{padding:6px 12px;margin-bottom:4px;font-size:13.5px}
+  .finds-head{margin-bottom:7px}
+  .stamp{bottom:16px;padding:6px 11px 5px}
+  .stamp strong{font-size:16px}
+  .stamp span{display:none}
+}
+
+/* phones: hero, then the sheet pins under the nav while the steps scroll below it */
+@media (max-width:900px){
+  .story-grid{display:block}
+  .hero{min-height:auto;padding-block:56px 40px}
+  .hero h1{max-width:none}
+  .sheet-col{display:contents}
+  .sheet-stick{top:var(--nav);z-index:5;height:min(60dvh,560px);min-height:0;padding:10px 12px 14px 0;background:var(--bg)}
+  .steps{padding-left:22px;padding-bottom:12vh}
+  .rail{top:0;bottom:12vh}
+  .step{min-height:64dvh;justify-content:flex-start;padding-top:6dvh}
+  .doc{padding:14px 16px 0}
+  .doc p{font-size:12.5px;line-height:1.5;margin-bottom:8px}
+  .sheet-head{padding:11px 16px;font-size:12px}
+  .finds{inset:10px 10px auto 10px}
+  .finds-head{margin-bottom:6px;font-size:12px}
+  .row{padding:5px 9px;margin-bottom:4px;font-size:12px}
+  .row .v.cite{font-size:11px}
+  .sheet-foot{padding:10px 16px 12px}
+  .call strong{font-size:16px}
+  .call div{font-size:11.5px}
+  .grade{margin-top:8px;padding-top:8px;font-size:12px}
+  .row{margin-bottom:3px}
+  .stamp{bottom:10px;right:12px;padding:5px 9px 4px;outline-offset:2px}
+  .stamp strong{font-size:14px}
+  .stamp span{display:none}
+  .example-note{display:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap">
+    <div class="nav-left"><a href="#how">How it works</a></div>
+    <a class="wordmark" href="pitch.html">PROV <span>/ watch</span></a>
+    <nav class="nav-links" aria-label="Primary"><a class="btn btn-primary btn-sm" href="intake.html">Start a pilot</a></nav>
+  </div>
+</header>
+<main id="main">
+<section class="story" aria-label="How a request is handled">
+  <div class="wrap story-grid">
+    <div class="hero">
+      <h1>Every company, every quarter</h1>
+      <p class="lede">Who could buy each company, how exposed it is to AI, and what its rivals did. Every point sourced.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="intake.html">Start a pilot</a>
+        <a class="btn btn-quiet" href="#how">See how it works</a>
+      </div>
+    </div>
+    <div class="sheet-col">
+      <div class="sheet-stick">
+        <div class="sheet-stack">
+          <figure class="sheet" aria-label="Example of a request being read, checked, logged and graded" style="margin:0">
+            <div class="sheet-head"><span><b>Quarterly report</b> excerpt, one portfolio company</span><span>Example</span></div>
+            <div class="sheet-body">
+              <div class="doc-layer"><div class="doc">
+<p>Two acquirers bought similar compliance software in the last year, and <mark class="hl">one of them says in its annual report that it intends to keep acquiring in this niche</mark>.</p>
+<p>Pricing is per supplier seat for document work that AI tools now automate, but <mark class="hl">retailers require their suppliers to join the network</mark>, which a new entrant can't copy quickly.</p>
+<p>A direct competitor launched an AI document checker in September. <mark class="hl">Ask management whether customers have raised it.</mark></p>
+              </div></div>
+              <div class="scan" aria-hidden="true"></div>
+              <div class="finds">
+                <div class="finds-head"><span>This quarter</span><span class="num">Q4 2026</span></div>
+<div class="row"><span>Likely buyers</span><span class="v ok">6, 3 strong</span></div>
+<div class="row"><span>AI exposure</span><span class="v mid">Mixed, 3 of 6</span></div>
+<div class="row"><span>Competitor moves</span><span class="v mid">4 this quarter</span></div>
+<div class="row"><span>New since last quarter</span><span class="v ok">1 new buyer</span></div>
+<div class="row"><span>Questions for management</span><span class="v mid">8</span></div>
+<div class="row"><span>Facts checked</span><span class="v ok">Then reviewed</span></div>
+              </div>
+              <div class="stamp"><strong>Logged</strong><span>13 Oct 2026<br>Next run Jan 2027</span></div>
+            </div>
+            <div class="sheet-foot">
+              <div class="call"><div>Companies<strong class="mono">6</strong></div><div>Sources<strong class="mono" id="conf">54</strong></div><div>Claims checked<strong class="mono">180</strong></div></div>
+              <div class="grade"><b>Facts checked.</b><span>Every number, date and quote checked against its source, then reviewed by a person.</span></div>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="rail" aria-hidden="true"><i></i></div>
+<article class="step" id="how">
+  <p class="verb">Read</p>
+  <h2>It starts with your portfolio</h2>
+  <p>Send the list once. Each quarter it reads what's public about every company: filings, the company's own site, its buyers' and rivals' announcements, trade press.</p>
+</article>
+<article class="step">
+  <p class="verb">Check</p>
+  <h2>Three checks per company</h2>
+  <p>Who could buy it, from the deals buyers have done and what they say they want; how exposed it is to AI, and where it could use AI itself; and what its competitors did this quarter.</p>
+</article>
+<article class="step">
+  <p class="verb">Write</p>
+  <h2>One report for the board</h2>
+  <p>A summary for each company, what changed since last quarter, and questions for management. Open it in a browser or print it for a board pack.</p>
+</article>
+<article class="step">
+  <p class="verb">Log</p>
+  <h2>Logged, so next quarter shows what changed</h2>
+  <p>A new buyer, a factor that moved, a rival that launched something. Each quarter builds on the last.</p>
+</article>
+<article class="step">
+  <p class="verb">Check facts</p>
+  <h2>Every fact checked, then reviewed</h2>
+  <p>Every number, date and quote is checked against its source, and anything a source contradicts is fixed. A person reviews the report before it's sent. The sources themselves are graded too, and repeated misses become lessons.</p>
+</article>
+    </div>
+  </div>
+</section>
+<section class="section" id="tools" aria-labelledby="tools-h">
+  <div class="wrap">
+    <h2 id="tools-h">The best companies are bought, not sold</h2>
+    <p class="sub">Know who's circling years before you need a banker, and what else changed around each company.</p>
+    <div class="tools">
+      <article class="tool feature">
+        <h3>Three checks, every quarter</h3>
+        <p>For each portfolio company, one report with the evidence behind every point.</p>
+        <ul class="checks">
+          <li>Who could buy it</li><li>AI threats and opportunities</li><li>Competitor moves</li>
+          <li>What changed since last quarter</li><li>Questions for management</li><li>Facts checked, then reviewed by a person</li>
+        </ul>
+      </article>
+      <article class="tool">
+        <h3>Buyers, in their own words</h3>
+        <p>Strategic acquirers and PE firms that have bought companies like yours, what each says it wants, and comparable deals with terms only as disclosed. Updated every quarter, so relationships start years before a sale.</p>
+      </article>
+      <article class="tool">
+        <h3>Research, not advice</h3>
+        <p>Delivered done, no software to learn. It never values a company, never recommends a sale, never makes introductions and takes no fee on any deal.</p>
+      </article>
+    </div>
+  </div>
+</section>
+<section class="section" aria-labelledby="work-h">
+  <div class="wrap">
+    <h2 id="work-h">How working together goes</h2>
+    <ol class="flow">
+<li><h3>We scope it</h3><p>A short call sets exactly what gets covered: a watchlist, a set of filings, one real question. Agreed before anything starts.</p></li>
+<li><h3>Done for you, from public sources</h3><p>We run the research on public information: filings, company releases, news and trade press. You get the finished report, with nothing to install or learn.</p></li>
+<li><h3>You get a written report</h3><p>What it found, what cuts against it, and every source it read. No buy or sell call. One section is left blank for your own judgment.</p></li>
+<li><h3>NDA first, always</h3><p>Signed before we see anything specific about your watchlist or your names. No exceptions.</p></li>
+<li><h3>You decide what's next</h3><p>Act on it, ignore it, or come back with a follow-up. The report is yours either way, with no obligation to continue.</p></li>
+    </ol>
+  </div>
+</section>
+<section class="section" aria-labelledby="bounds-h">
+  <div class="wrap">
+    <h2 id="bounds-h">What this is, and what it isn't</h2>
+    <div class="bounds">
+      <div class="is"><h3>This is</h3><ul><li>One sourced quarterly report covering every portfolio company</li><li>A running list of likely buyers for each company, with comparable deals as disclosed</li><li>AI exposure and competitor moves, with what changed since last quarter</li><li>Every number, date and quote checked against its source and reviewed by a person before it's sent</li><li>An early partnership. The first clients help shape what this becomes, with direct access to the person building it</li></ul></div>
+      <div class="isnt"><h3>This isn't</h3><ul><li>Investment or M&A advice, a valuation, or a recommendation to buy or sell</li><li>A banker. It never makes introductions and takes no fee on any deal</li><li>A forecast. It reports what's public today, not what will happen next</li><li>Software to learn. It's delivered as a finished report</li></ul></div>
+    </div>
+  </div>
+</section>
+<section class="section engage" id="engage" aria-labelledby="engage-h">
+  <div class="wrap">
+    <h2 id="engage-h">Start a pilot</h2>
+    <p class="sub">Send your portfolio list. It goes straight to the person who runs the research.</p>
+    <div class="engage-row">
+      <a class="btn btn-primary" href="intake.html">Start a pilot</a>
+      <div class="mailbox"><code id="contact-email">grant02339@gmail.com</code>
+        <button class="copy-btn" type="button" onclick="copyEmail()" id="copy-email-btn">Copy</button></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site-foot">
+  <div class="wrap"><span class="wordmark foot-mark">PROV <span>/ watch</span></span><p>This isn't investment or M&A advice, a valuation, or a recommendation to buy or sell anything. It's research: what's public about each company, checked against its sources and reviewed by a person, with every source listed. PROV is short for provenance: every fact traced back to where it came from.</p><button class="theme-toggle" type="button" id="theme-toggle">Light version</button>
+<script>
+(function(){
+  var root=document.documentElement, btn=document.getElementById('theme-toggle');
+  function label(){btn.textContent=root.getAttribute('data-theme')==='light'?'Dark version':'Light version';}
+  label();
+  btn.addEventListener('click',function(){
+    var light=root.getAttribute('data-theme')!=='light';
+    if(light){root.setAttribute('data-theme','light');}else{root.removeAttribute('data-theme');}
+    try{localStorage.setItem('null-theme',light?'light':'dark');}catch(e){}
+    var m=document.querySelector('meta[name="theme-color"]'); if(m){m.content=light?'#F3F3F1':'#0B0B0C';}
+    label();
+  });
+})();
+</script></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"
+        integrity="sha384-XmJ9SoHtVOHoQUcKvFAzVXwdkKo1Ie3bhmSoIAkcdsHGaIrVJIkmozyq0FJeb/Ly" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"
+        integrity="sha384-wl5TeDVvOWt30Pbf8aSo2ZrzsOjddu3avOBvHe+p+OhJt9gP6w9YXmDkN5DK2/dF" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"
+        integrity="sha384-jqpi9VmOdhyLoLURgjCn7EpnG9BbnHW57ibIZoeaIU+erWDH3k8fQQg0xH2ySjnw" crossorigin="anonymous"></script>
+
+<script>
+window.__story=function(seg,body){
+  // Staggered fromTo tweens only pre-render their first target, so set every start state up front.
+  gsap.set('.doc p',{opacity:.5}); gsap.set('mark.hl',{backgroundSize:'0% 80%'});
+  gsap.set('.finds',{autoAlpha:0}); gsap.set('.finds .row',{autoAlpha:0,y:10});
+  seg(0).fromTo('.scan',{autoAlpha:0,y:0},{autoAlpha:1,duration:.06})
+        .to('.scan',{y:function(){return body.clientHeight;},duration:1},'<')
+        .fromTo('.doc p',{opacity:.5},{opacity:1,duration:.3,stagger:.3},'<')
+        .to('.scan',{autoAlpha:0,duration:.08});
+  seg(1).fromTo('mark.hl',{backgroundSize:'0% 80%'},{backgroundSize:'100% 80%',duration:.35,stagger:.22})
+        .fromTo('.doc-layer',{opacity:1},{opacity:.05,duration:.3},'+=.1')
+        .fromTo('.finds',{autoAlpha:0},{autoAlpha:1,duration:.1},'<')
+        .fromTo('.finds .row',{autoAlpha:0,y:10},{autoAlpha:1,y:0,duration:.25,stagger:.12},'<');
+  var conf=document.getElementById('conf'), target=parseFloat(conf.textContent), o={v:0};
+  conf.textContent='0';
+  seg(2).fromTo('.call',{autoAlpha:0,y:26},{autoAlpha:1,y:0,duration:.6})
+        .to(o,{v:target,duration:.6,onUpdate:function(){conf.textContent=Math.round(o.v);}},'<.2');
+  seg(3).fromTo('.stamp',{autoAlpha:0,scale:1.7,rotate:-18},{autoAlpha:1,scale:1,rotate:-8,duration:1,ease:'back.out(2.2)'});
+  seg(4).fromTo('.grade',{clipPath:'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0)',duration:1});
+};
+</script>
+
+<script>
+function copyEmail(){
+  var text=document.getElementById('contact-email').textContent;
+  var btn=document.getElementById('copy-email-btn');
+  function done(ok){btn.textContent=ok?'Copied':'Select and copy';setTimeout(function(){btn.textContent='Copy';},1600);}
+  try{navigator.clipboard.writeText(text).then(function(){done(true);},function(){done(false);});}catch(e){done(false);}
+}
+(function(){
+  var root=document.documentElement;
+  if(!root.classList.contains('js-motion'))return;
+  if(!window.gsap||!window.ScrollTrigger||!window.Lenis){root.classList.remove('js-motion');return;}
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Smooth scroll, wired the way the Lenis README specifies for GSAP.
+  var lenis=new Lenis({lerp:.1});
+  lenis.on('scroll',ScrollTrigger.update);
+  gsap.ticker.add(function(t){lenis.raf(t*1000);});
+  gsap.ticker.lagSmoothing(0);
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click',function(e){
+      var id=a.getAttribute('href'); if(id.length<2)return;
+      var el=document.querySelector(id); if(!el)return;
+      e.preventDefault(); lenis.scrollTo(el,{offset:-72});
+    });
+  });
+
+  function splitWords(el){
+    el.innerHTML=el.textContent.trim().split(/\s+/).map(function(w){return '<span class="w"><span>'+w+'</span></span>';}).join(' ');
+    return el.querySelectorAll('.w>span');
+  }
+
+  // Load: the headline rises, the sheet settles onto the stack. This is the one load moment.
+  var intro=gsap.timeline({defaults:{ease:'expo.out'}});
+  intro.from(splitWords(document.querySelector('.hero h1')),{yPercent:115,duration:1.15,stagger:.05})
+       .from('.hero .lede,.hero-ctas',{y:18,opacity:0,duration:1,stagger:.08},.35)
+       .from('.sheet-stack',{y:80,rotate:-5,opacity:0,duration:1.4},.15)
+       .from('.doc',{opacity:0,duration:.8},.7);
+
+  // One reading line drives both the lit step and the sheet, so they can't drift apart. A step lights up
+  // when its first line of text reaches the reading line and stays lit until the next step's text gets
+  // there, so exactly one is lit at a time. Its part of the sheet starts at that same moment and finishes
+  // while the text is still being read (the sheet trails the words a little, then holds). On phones the
+  // sheet pins under the nav and covers the top of the screen, so the reading line moves into the visible
+  // strip below it.
+  var steps=gsap.utils.toArray('.step');
+  var heads=steps.map(function(s){return s.querySelector('.verb')||s;});
+  var phone=window.matchMedia('(max-width:900px)');
+  function zone(){
+    var vh=window.innerHeight;
+    if(!phone.matches)return {top:0,height:vh};
+    var nav=document.querySelector('.nav'), stick=document.querySelector('.sheet-stick');
+    var top=(nav?nav.offsetHeight:0)+(stick?stick.offsetHeight:0);
+    return {top:top,height:Math.max(vh-top,120)};
+  }
+  function at(f){var z=zone();return 'top '+Math.round(z.top+z.height*f)+'px';}
+  function readLine(){return at(phone.matches?.55:.58);}
+  function doneLine(){return at(phone.matches?.12:.3);}
+  heads.forEach(function(h,i){
+    var last=i===heads.length-1;
+    ScrollTrigger.create({trigger:h,start:readLine,endTrigger:last?'.steps':heads[i+1],
+      end:last?'bottom top':readLine,toggleClass:{targets:steps[i],className:'on'},invalidateOnRefresh:true});
+  });
+  gsap.fromTo('.rail i',{scaleY:0},{scaleY:1,ease:'none',scrollTrigger:{trigger:heads[0],start:readLine,
+    endTrigger:heads[heads.length-1],end:readLine,scrub:true,invalidateOnRefresh:true}});
+
+  // Each step scrubs its own part of the sheet, so scrolling back up rewinds it exactly. scrub:.5 adds a
+  // short catch-up lag, so a fast flick still plays the change rather than jumping to the end of it.
+  function seg(i){
+    return gsap.timeline({defaults:{ease:'none'},
+      scrollTrigger:{trigger:heads[i],start:readLine,end:doneLine,scrub:.5,invalidateOnRefresh:true}});
+  }
+  var body=document.querySelector('.sheet-body');
+  window.__story(seg,body);
+
+  // Closing call to action: one reveal, played once.
+  var eng=document.querySelector('.engage h2');
+  if(eng){gsap.from(splitWords(eng),{yPercent:115,duration:1.1,ease:'expo.out',stagger:.05,
+    scrollTrigger:{trigger:eng,start:'top 82%',once:true}});}
+
+  if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){ScrollTrigger.refresh();});}
+})();
+</script>
+</body>
+</html>
